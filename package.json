@@ -6,6 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
     "start:docker": "docker compose down && docker compose up -d && docker logs api-service -f"
   },
   "keywords": [],
