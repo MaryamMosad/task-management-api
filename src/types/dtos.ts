@@ -8,6 +8,7 @@ import {
   IsISO8601,
   IsMongoId,
   IsPositive,
+  ValidateIf,
 } from "class-validator";
 import { TaskPriorityEnum, TaskStatusEnum } from "./enums";
 import { Transform } from "class-transformer";
@@ -76,7 +77,7 @@ export class UpdateTaskDto {
   dueDate?: Date;
 }
 
-export class TaskPaginatedListQueryParams {
+export class PaginationQueryParams {
   @Transform((val) => +val.value)
   @IsPositive()
   @IsOptional()
@@ -86,17 +87,28 @@ export class TaskPaginatedListQueryParams {
   @IsPositive()
   @IsOptional()
   limit: number;
+}
 
-  @IsOptional()
+export class TasksSearchQueryParams extends PaginationQueryParams {
+  @ValidateIf((o) => !o.description)
   @IsString()
   @MinLength(2)
-  @MaxLength(250)
-  search: string;
+  @MaxLength(50)
+  title: string;
 
+  @ValidateIf((o) => !o.title)
+  @IsString()
+  @MinLength(2)
+  @MaxLength(50)
+  description: string;
+}
+export class TasksFilterQueryParams extends PaginationQueryParams {
+  @ValidateIf((o) => !o.status)
   @IsOptional()
   @IsEnum(TaskPriorityEnum)
   priority: TaskPriorityEnum;
 
+  @ValidateIf((o) => !o.priority)
   @IsOptional()
   @IsEnum(TaskStatusEnum)
   status: TaskStatusEnum;

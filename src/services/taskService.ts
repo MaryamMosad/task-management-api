@@ -24,22 +24,24 @@ const deleteTask = async (taskId: string) => {
 };
 
 const getPaginatedList = async (
-  skip: number,
+  page: number,
   limit: number,
   userId: string,
-  keyword: string,
+  search: { title?: string; description?: string } = {},
   filter: {
     status?: TaskStatusEnum;
     priority?: TaskPriorityEnum;
   } = {}
 ) => {
+  const skip = (page - 1) * limit;
+
   const whereOptions: any = {
     userId,
-    ...(keyword && {
-      $or: [
-        { title: { $regex: keyword, $options: "i" } },
-        { description: { $regex: keyword, $options: "i" } },
-      ],
+    ...(search?.title && {
+      title: { $regex: search.title, $options: "i" },
+    }),
+    ...(search?.description && {
+      description: { $regex: search.description, $options: "i" },
     }),
     ...(filter?.priority && { priority: filter.priority }),
     ...(filter?.status && { status: filter.status }),
@@ -49,7 +51,7 @@ const getPaginatedList = async (
 
   const totalTasks = await Task.countDocuments(whereOptions);
 
-  return { tasks, totalTasks };
+  return { tasks, totalTasks, totalPages: Math.ceil(totalTasks / limit) };
 };
 
 export default {

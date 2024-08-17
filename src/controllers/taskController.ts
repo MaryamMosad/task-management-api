@@ -46,24 +46,60 @@ const getAllTasks = async (req, res: Response, next: NextFunction) => {
     const userId = req.user?.id;
     const page = Number(req.query.page) || 1;
     const limit = Number(req.query.limit) || 10;
-    const keyword = req.query.search;
-    const statusFilter = req.query.status;
-    const priorityFilter = req.query.priority;
 
-    const skip = (page - 1) * limit;
+    const { tasks, totalTasks, totalPages } =
+      await taskService.getPaginatedList(page, limit, userId);
 
-    const { tasks, totalTasks } = await taskService.getPaginatedList(
-      skip,
-      limit,
-      userId,
-      keyword,
-      {
-        status: statusFilter,
-        priority: priorityFilter,
-      }
-    );
+    return res.status(200).json({
+      pageInfo: {
+        page: page,
+        limit: limit,
+        totalTasks,
+        totalPages,
+      },
+      data: tasks,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
-    const totalPages = Math.ceil(totalTasks / limit);
+const searchTasks = async (req, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.id;
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+
+    const { tasks, totalTasks, totalPages } =
+      await taskService.getPaginatedList(page, limit, userId, {
+        title: req.query.title,
+        description: req.query.description,
+      });
+
+    return res.status(200).json({
+      pageInfo: {
+        page: page,
+        limit: limit,
+        totalTasks,
+        totalPages,
+      },
+      data: tasks,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+const filterTasks = async (req, res: Response, next: NextFunction) => {
+  try {
+    const userId = req.user?.id;
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 10;
+
+    const { tasks, totalTasks, totalPages } =
+      await taskService.getPaginatedList(page, limit, userId, null, {
+        status: req.query.status,
+        priority: req.query.priority,
+      });
 
     return res.status(200).json({
       pageInfo: {
@@ -93,4 +129,12 @@ const deleteTask = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
-export default { createTask, deleteTask, updateTask, getTaskById, getAllTasks };
+export default {
+  createTask,
+  deleteTask,
+  updateTask,
+  getTaskById,
+  getAllTasks,
+  searchTasks,
+  filterTasks,
+};
