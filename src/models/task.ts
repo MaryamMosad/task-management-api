@@ -26,7 +26,6 @@ const taskSchema = new Schema(
     timestamps: true,
   }
 );
-console.log(Object.values(TaskPriorityEnum))
 const Task = model("Task", taskSchema);
 
 export default Task;

@@ -3,6 +3,7 @@ import { RegisterDto } from "../types/dtos";
 import { compare, hash } from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { HttpError } from "../utils/errorHandler";
+import { TokenPayload } from "../types/types";
 
 const register = async (input: RegisterDto) => {
   const isUserNameTaken = await findUserByUserName(input.username);
@@ -55,7 +56,14 @@ const generateAuthTokenByUserId = (userId: string) => {
   });
 };
 
+const getUserFromJWT = async (token: string) => {
+  const payload = <TokenPayload>await jwt.verify(token, process.env.JWT_SECRET);
+  if (!payload.userId) return null;
+  return await User.findOne({ _id: payload.userId });
+};
+
 export default {
   register,
   login,
+  getUserFromJWT,
 };
