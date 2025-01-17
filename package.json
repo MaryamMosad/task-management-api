@@ -8,7 +8,7 @@
     "dev": "nodemon src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "start:docker": "docker compose down && docker compose up -d && docker logs api-service -f"
+    "start:docker": "docker compose down && docker compose up -d --build && docker logs api-service -f"
   },
   "keywords": [],
   "author": "",

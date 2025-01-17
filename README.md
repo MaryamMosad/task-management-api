@@ -17,9 +17,10 @@ This project is a Task Management API. It provides a set of RESTful endpoints to
 
 ## Getting Started
 
-To start the project in a Docker environment, run:
+To start the project in a Docker environment (development mode), run:
 
 ```bash
+npm i 
 npm run start:docker
 ```
 
